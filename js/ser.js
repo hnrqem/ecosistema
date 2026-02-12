@@ -85,4 +85,14 @@ export default class Ser {
         this.x += (Math.random() - 0.5) * 2;
         this.y += (Math.random() - 0.5) * 2;
     }
-}
+
+    // ser.js -> Dentro da classe Ser
+
+    checarBordas(largura, altura) {
+        if (this.x > largura) this.x = 0;
+        if (this.x < 0) this.x = largura;
+        if (this.y > altura) this.y = 0;
+        if (this.y < 0) this.y = altura;
+    }
+    }
+
