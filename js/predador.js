@@ -5,14 +5,14 @@ export default class Predador extends Ser {
         super(x, y);
         this.energia = 150;
         this.dna = {
-            velocidade: 3.2,
-            raioVisao: 250,
+            velocidade: 2.2,
+            raioVisao: 350,
             cor: '#ff0000'
         };
     }
 
     viver(listaPresas) {
-        this.energia -= 0.5; // Predador gasta energia muito rápido
+        this.energia -= 1.1; // Predador gasta energia muito rápido
 
         let alvo = this.buscarComida(listaPresas); // Busca seres em vez de pontos verdes
         if (alvo) {
@@ -30,3 +30,4 @@ export default class Predador extends Ser {
         }
     }
 }
+
