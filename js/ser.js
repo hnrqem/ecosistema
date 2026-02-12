@@ -4,7 +4,7 @@ export default class Ser {
         this.y = y;
         this.energia = 100;
         
-        // DNA: Evita o vermelho (0/360 no HSL) para as presas
+        // DNA: Mantém a lógica de evitar o vermelho para as presas
         this.dna = dna || {
             velocidade: Math.random() * 2 + 1,
             raioVisao: Math.random() * 100 + 100,
@@ -19,7 +19,7 @@ export default class Ser {
         let ameaca = this.detectarAmeaca(listaPredadores);
         if (ameaca) {
             this.fugir(ameaca);
-            this.energia -= 0.1; // Fuga cansa mais
+            this.energia -= 0.1; // Fuga consome energia extra
         } else {
             // 2. Se estiver seguro, busca comida
             let alvo = this.buscarComida(listaComida);
@@ -51,6 +51,7 @@ export default class Ser {
         let dy = this.y - ameaca.y;
         let dist = Math.hypot(dx, dy);
         if (dist > 0) {
+            // Fuga com bônus de 30% na velocidade
             this.x += (dx / dist) * this.dna.velocidade * 1.3;
             this.y += (dy / dist) * this.dna.velocidade * 1.3;
         }
@@ -86,13 +87,11 @@ export default class Ser {
         this.y += (Math.random() - 0.5) * 2;
     }
 
-    // ser.js -> Dentro da classe Ser
-
+    // Sistema de "Teletransporte" nas bordas
     checarBordas(largura, altura) {
         if (this.x > largura) this.x = 0;
         if (this.x < 0) this.x = largura;
         if (this.y > altura) this.y = 0;
         if (this.y < 0) this.y = altura;
     }
-    }
-
+}
