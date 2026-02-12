@@ -22,6 +22,7 @@ export default class Mundo {
             this.populacao[i].viver(this.comidas, this.predadores);
             if (this.populacao[i].energia <= 0) {
                 this.populacao.splice(i, 1);
+                s.checarBordas(this.largura, this.altura);
             }
         }
 
@@ -30,6 +31,7 @@ export default class Mundo {
             this.predadores[i].viver(this.populacao);
             if (this.predadores[i].energia <= 0) {
                 this.predadores.splice(i, 1);
+                p.checarBordas(this.largura, this.altura); // <--- Adicione esta linha
             }
         }
 
@@ -89,3 +91,4 @@ export default class Mundo {
         this.ctx.shadowBlur = 0;
     }
 }
+
