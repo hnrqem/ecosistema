@@ -60,27 +60,57 @@ export default class Ser {
     // ser.js
 
 // Novo método para calcular a distância levando em conta as bordas
-distanciaToroidal(alvoX, alvoY) {
-    let dx = Math.abs(alvoX - this.x);
-    let dy = Math.abs(alvoY - this.y);
-
-    // Se a distância for maior que metade da tela, o caminho mais curto é pelo outro lado
-    if (dx > this.largura / 2) dx = this.largura - dx;
-    if (dy > this.altura / 2) dy = this.altura - dy;
-
-    return Math.hypot(dx, dy);
-}
+// No topo do ser.js, vamos adicionar a largura e altura como propriedades globais 
+// ou passá-las no constructor. Como o seu main.js não passa essas info, 
+// vamos usar as medidas fixas que você definiu (1100x800).
 
 moverPara(alvo) {
+    const LARGURA = 1100;
+    const ALTURA = 800;
+
     let dx = alvo.x - this.x;
     let dy = alvo.y - this.y;
 
-    // Ajuste para atravessar a borda horizontal
-    if (Math.abs(dx) > this.largura / 2) {
-        this.x -= Math.sign(dx) * this.dna.velocidade;
-    } else {
-        this.x += Math.sign(dx) * this.dna.velocidade;
+    // Lógica Toroidal: Se a distância for maior que metade da tela, 
+    // significa que é mais perto ir pelo outro lado.
+    if (Math.abs(dx) > LARGURA / 2) {
+        dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
     }
+    if (Math.abs(dy) > ALTURA / 2) {
+        dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
+    }
+
+    let dist = Math.hypot(dx, dy);
+
+    if (dist > 0) {
+        this.x += (dx / dist) * this.dna.velocidade;
+        this.y += (dy / dist) * this.dna.velocidade;
+    }
+}
+
+// O buscarComida também precisa dessa lógica para não ignorar alvos do outro lado
+buscarComida(listaComida) {
+    const LARGURA = 1100;
+    const ALTURA = 800;
+    let alvo = null;
+    let dMin = this.dna.raioVisao;
+
+    listaComida.forEach(c => {
+        let dx = Math.abs(c.x - this.x);
+        let dy = Math.abs(c.y - this.y);
+
+        // Ajuste de distância para a borda
+        if (dx > LARGURA / 2) dx = LARGURA - dx;
+        if (dy > ALTURA / 2) dy = ALTURA - dy;
+
+        let d = Math.hypot(dx, dy);
+        if (d < dMin) {
+            dMin = d;
+            alvo = c;
+        }
+    });
+    return alvo;
+}
 
     // Ajuste para atravessar a borda vertical
     if (Math.abs(dy) > this.altura / 2) {
@@ -110,4 +140,5 @@ moverPara(alvo) {
         if (this.y < 0) this.y = altura;
     }
 }
+
 
