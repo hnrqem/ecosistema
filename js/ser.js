@@ -4,7 +4,7 @@ export default class Ser {
         this.y = y;
         this.energia = 100;
         
-        // DNA: Mantém a lógica de evitar o vermelho para as presas
+        // DNA: Atributos genéticos
         this.dna = dna || {
             velocidade: Math.random() * 2 + 1,
             raioVisao: Math.random() * 100 + 100,
@@ -32,14 +32,27 @@ export default class Ser {
         }
     }
 
+    // Calcula distância considerando o "atalho" pelas bordas
+    obterDistanciaToroidal(alvoX, alvoY) {
+        const LARGURA = 1100;
+        const ALTURA = 800;
+        let dx = Math.abs(alvoX - this.x);
+        let dy = Math.abs(alvoY - this.y);
+
+        if (dx > LARGURA / 2) dx = LARGURA - dx;
+        if (dy > ALTURA / 2) dy = ALTURA - dy;
+
+        return { dx, dy, dist: Math.hypot(dx, dy) };
+    }
+
     detectarAmeaca(listaPredadores) {
         let ameacaMaisProxima = null;
         let distMinima = this.dna.raioVisao * 0.7;
 
         for (let p of listaPredadores) {
-            let d = Math.hypot(p.x - this.x, p.y - this.y);
-            if (d < distMinima) {
-                distMinima = d;
+            const info = this.obterDistanciaToroidal(p.x, p.y);
+            if (info.dist < distMinima) {
+                distMinima = info.dist;
                 ameacaMaisProxima = p;
             }
         }
@@ -47,81 +60,58 @@ export default class Ser {
     }
 
     fugir(ameaca) {
+        const LARGURA = 1100;
+        const ALTURA = 800;
+
         let dx = this.x - ameaca.x;
         let dy = this.y - ameaca.y;
+
+        // Se o predador está do outro lado da borda, ajustamos o vetor de fuga
+        if (Math.abs(dx) > LARGURA / 2) dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
+        if (Math.abs(dy) > ALTURA / 2) dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
+
         let dist = Math.hypot(dx, dy);
         if (dist > 0) {
-            // Fuga com bônus de 30% na velocidade
             this.x += (dx / dist) * this.dna.velocidade * 1.3;
             this.y += (dy / dist) * this.dna.velocidade * 1.3;
         }
     }
 
-    // ser.js
+    buscarComida(listaComida) {
+        let alvo = null;
+        let dMin = this.dna.raioVisao;
 
-// Novo método para calcular a distância levando em conta as bordas
-// No topo do ser.js, vamos adicionar a largura e altura como propriedades globais 
-// ou passá-las no constructor. Como o seu main.js não passa essas info, 
-// vamos usar as medidas fixas que você definiu (1100x800).
-
-moverPara(alvo) {
-    const LARGURA = 1100;
-    const ALTURA = 800;
-
-    let dx = alvo.x - this.x;
-    let dy = alvo.y - this.y;
-
-    // Lógica Toroidal: Se a distância for maior que metade da tela, 
-    // significa que é mais perto ir pelo outro lado.
-    if (Math.abs(dx) > LARGURA / 2) {
-        dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
-    }
-    if (Math.abs(dy) > ALTURA / 2) {
-        dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
+        listaComida.forEach(c => {
+            const info = this.obterDistanciaToroidal(c.x, c.y);
+            if (info.dist < dMin) {
+                dMin = info.dist;
+                alvo = c;
+            }
+        });
+        return alvo;
     }
 
-    let dist = Math.hypot(dx, dy);
+    moverPara(alvo) {
+        const LARGURA = 1100;
+        const ALTURA = 800;
 
-    if (dist > 0) {
-        this.x += (dx / dist) * this.dna.velocidade;
-        this.y += (dy / dist) * this.dna.velocidade;
-    }
-}
+        let dx = alvo.x - this.x;
+        let dy = alvo.y - this.y;
 
-// O buscarComida também precisa dessa lógica para não ignorar alvos do outro lado
-buscarComida(listaComida) {
-    const LARGURA = 1100;
-    const ALTURA = 800;
-    let alvo = null;
-    let dMin = this.dna.raioVisao;
+        // Lógica de atalho pela borda
+        if (Math.abs(dx) > LARGURA / 2) dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
+        if (Math.abs(dy) > ALTURA / 2) dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
 
-    listaComida.forEach(c => {
-        let dx = Math.abs(c.x - this.x);
-        let dy = Math.abs(c.y - this.y);
-
-        // Ajuste de distância para a borda
-        if (dx > LARGURA / 2) dx = LARGURA - dx;
-        if (dy > ALTURA / 2) dy = ALTURA - dy;
-
-        let d = Math.hypot(dx, dy);
-        if (d < dMin) {
-            dMin = d;
-            alvo = c;
+        let dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+            this.x += (dx / dist) * this.dna.velocidade;
+            this.y += (dy / dist) * this.dna.velocidade;
         }
-    });
-    return alvo;
-}
-
-    // Ajuste para atravessar a borda vertical
-    if (Math.abs(dy) > this.altura / 2) {
-        this.y -= Math.sign(dy) * this.dna.velocidade;
-    } else {
-        this.y += Math.sign(dy) * this.dna.velocidade;
     }
-}
 
     tentarComer(alvo, lista) {
-        if (Math.hypot(alvo.x - this.x, alvo.y - this.y) < 5) {
+        const info = this.obterDistanciaToroidal(alvo.x, alvo.y);
+        if (info.dist < 5) {
             lista.splice(lista.indexOf(alvo), 1);
             this.energia += 30;
         }
@@ -132,13 +122,9 @@ buscarComida(listaComida) {
         this.y += (Math.random() - 0.5) * 2;
     }
 
-    // Sistema de "Teletransporte" nas bordas
     checarBordas(largura, altura) {
         if (this.x > largura) this.x = 0;
         if (this.x < 0) this.x = largura;
         if (this.y > altura) this.y = 0;
         if (this.y < 0) this.y = altura;
     }
-}
-
-
