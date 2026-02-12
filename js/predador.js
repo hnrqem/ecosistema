@@ -6,7 +6,7 @@ export default class Predador extends Ser {
         this.energia = 150; // Começa com mais fôlego
         this.dna = {
             velocidade: 3.5, // Bem mais rápido que a presa
-            raioVisao: 600,   // Visão aguçada
+            raioVisao: 1000,   // Visão aguçada
             cor: '#ff0000'    // Vermelho intimidador
         };
     }
@@ -53,5 +53,6 @@ export default class Predador extends Ser {
         }
     }
 }
+
 
 
