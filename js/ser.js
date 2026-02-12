@@ -3,7 +3,7 @@ export default class Ser {
         this.x = x;
         this.y = y;
         this.energia = 100;
-        this.larguraMundo = 1100; // Ajustado para seu novo canvas
+        this.larguraMundo = 1100;
         this.alturaMundo = 800;
         
         this.dna = dna || {
@@ -16,7 +16,6 @@ export default class Ser {
     viver(listaComida, listaPredadores) {
         this.energia -= 0.15;
         let ameaca = this.detectarAmeaca(listaPredadores);
-        
         if (ameaca) {
             this.fugir(ameaca);
             this.energia -= 0.1;
@@ -31,7 +30,6 @@ export default class Ser {
         }
     }
 
-    // Calcula a direção mais curta atravessando a borda
     obterVetorCurto(alvoX, alvoY) {
         let dx = alvoX - this.x;
         let dy = alvoY - this.y;
