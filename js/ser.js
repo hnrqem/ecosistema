@@ -1,136 +1,88 @@
-// ser.js
 export default class Ser {
-    constructor(x, y, dna = null) {
+    constructor(x, y, dna) {
         this.x = x;
         this.y = y;
         this.energia = 100;
         
+        // DNA: Evita o vermelho (0/360 no HSL) para as presas
         this.dna = dna || {
             velocidade: Math.random() * 2 + 1,
-            raioVisao: Math.random() * 150 + 100,
-            cor: `hsl(${Math.random() * 280+40}, 70%, 50%)`
+            raioVisao: Math.random() * 100 + 100,
+            cor: `hsl(${Math.random() * 280 + 40}, 70%, 50%)`
         };
     }
 
-    // Atualize o método viver no ser.js
-viver(listaComida, listaPredadores) {
-    this.energia -= 0.1; // Custo de vida
+    viver(listaComida, listaPredadores) {
+        this.energia -= 0.15; // Metabolismo base
 
-    // 1. Verificar se há perigo por perto
-    let perigo = this.detectarAmeaca(listaPredadores);
-
-    if (perigo) {
-        this.fugir(perigo);
-        this.energia -= 0.1; // Fugir gasta mais energia!
-    } else {
-        // 2. Se não houver perigo, busca comida normalmente
-        let alvo = this.buscarComida(listaComida);
-        if (alvo) {
-            this.moverPara(alvo);
-            this.tentarComer(alvo, listaComida);
+        // 1. Prioridade máxima: Fugir de predadores
+        let ameaca = this.detectarAmeaca(listaPredadores);
+        if (ameaca) {
+            this.fugir(ameaca);
+            this.energia -= 0.1; // Fuga cansa mais
         } else {
-            this.vagar();
-        }
-    }
-}
-
-detectarAmeaca(listaPredadores) {
-    let ameacaMaisProxima = null;
-    let distMinima = this.dna.raioVisao * 0.8; // Só foge se estiver bem perto
-
-    for (let p of listaPredadores) {
-        let d = Math.sqrt((p.x - this.x) ** 2 + (p.y - this.y) ** 2);
-        if (d < distMinima) {
-            distMinima = d;
-            ameacaMaisProxima = p;
-        }
-    }
-    return ameacaMaisProxima;
-}
-
-    buscarComida(listaComida) {
-        let maisProxima = null;
-        let distMinima = this.dna.raioVisao;
-
-        for (let comida of listaComida) {
-            const d = Math.sqrt((comida.x - this.x) ** 2 + (comida.y - this.y) ** 2);
-            if (d < distMinima) {
-                distMinima = d;
-                maisProxima = comida;
+            // 2. Se estiver seguro, busca comida
+            let alvo = this.buscarComida(listaComida);
+            if (alvo) {
+                this.moverPara(alvo);
+                this.tentarComer(alvo, listaComida);
+            } else {
+                this.vagar();
             }
         }
-        return maisProxima;
+    }
+
+    detectarAmeaca(listaPredadores) {
+        let ameacaMaisProxima = null;
+        let distMinima = this.dna.raioVisao * 0.7;
+
+        for (let p of listaPredadores) {
+            let d = Math.hypot(p.x - this.x, p.y - this.y);
+            if (d < distMinima) {
+                distMinima = d;
+                ameacaMaisProxima = p;
+            }
+        }
+        return ameacaMaisProxima;
+    }
+
+    fugir(ameaca) {
+        let dx = this.x - ameaca.x;
+        let dy = this.y - ameaca.y;
+        let dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+            this.x += (dx / dist) * this.dna.velocidade * 1.3;
+            this.y += (dy / dist) * this.dna.velocidade * 1.3;
+        }
+    }
+
+    buscarComida(listaComida) {
+        let alvo = null;
+        let dMin = this.dna.raioVisao;
+        listaComida.forEach(c => {
+            let d = Math.hypot(c.x - this.x, c.y - this.y);
+            if (d < dMin) { dMin = d; alvo = c; }
+        });
+        return alvo;
     }
 
     moverPara(alvo) {
-        const dx = alvo.x - this.x;
-        const dy = alvo.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist > 1) {
-            this.x += (dx / dist) * this.dna.velocidade;
-            this.y += (dy / dist) * this.dna.velocidade;
-        }
-        this.energia -= this.dna.velocidade * 0.1;
+        let dx = alvo.x - this.x;
+        let dy = alvo.y - this.y;
+        let dist = Math.hypot(dx, dy);
+        this.x += (dx / dist) * this.dna.velocidade;
+        this.y += (dy / dist) * this.dna.velocidade;
     }
 
-    tentarComer(alvo, listaComida) {
-        const d = Math.sqrt((alvo.x - this.x) ** 2 + (alvo.y - this.y) ** 2);
-        if (d < 15) {
-            const index = listaComida.indexOf(alvo);
-            if (index > -1) {
-                listaComida.splice(index, 1);
-                this.energia += 50;
-            }
+    tentarComer(alvo, lista) {
+        if (Math.hypot(alvo.x - this.x, alvo.y - this.y) < 5) {
+            lista.splice(lista.indexOf(alvo), 1);
+            this.energia += 30;
         }
     }
 
     vagar() {
-        this.x += (Math.random() - 0.5) * this.dna.velocidade;
-        this.y += (Math.random() - 0.5) * this.dna.velocidade;
+        this.x += (Math.random() - 0.5) * 2;
+        this.y += (Math.random() - 0.5) * 2;
     }
-    // Dentro da classe Ser em ser.js
-    fugir(ameaca) {
-        // 1. Calcula a direção para longe do predador
-        let dx = this.x - ameaca.x;
-        let dy = this.y - ameaca.y;
-        
-        // 2. Normaliza a distância (pitágoras)
-        let distancia = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distancia > 0) {
-            // Move-se na direção oposta multiplicada pela velocidade
-            // Adicionamos um bônus de velocidade para a "adrenalina" da fuga
-            const velocidadeFuga = this.dna.velocidade * 1.2;
-            this.x += (dx / distancia) * velocidadeFuga;
-            this.y += (dy / distancia) * velocidadeFuga;
-        }
-    }
-
-    
-
-    // Dentro da classe Ser no arquivo ser.js
-
-tentarReproduzir() {
-    // Se ele acumulou muita energia (ex: 150), ele se divide
-    if (this.energia > 150) {
-        this.energia -= 70; // Perde energia para "parir" o filho
-
-        // O filho herda o DNA do pai com uma pequena MUTACÃO
-        const dnaFilho = {
-            velocidade: this.dna.velocidade + (Math.random() * 0.2 - 0.1), 
-            raioVisao: this.dna.raioVisao + (Math.random() * 20 - 10), // Variação de visão
-            cor: this.dna.cor // Mantém a cor da linhagem
-        };
-
-        // Impede que o DNA fique "estragado" (visão negativa ou velocidade zero)
-        dnaFilho.velocidade = Math.max(0.5, dnaFilho.velocidade);
-        dnaFilho.raioVisao = Math.max(20, dnaFilho.raioVisao);
-
-        return new Ser(this.x, this.y, dnaFilho);
-    }
-    return null;
 }
-}
-
-
