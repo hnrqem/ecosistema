@@ -17,23 +17,37 @@ export default class Mundo {
     }
 
     atualizar() {
-        // Ciclo das Presas
-        for (let i = this.populacao.length - 1; i >= 0; i--) {
-            this.populacao[i].viver(this.comidas, this.predadores);
-            if (this.populacao[i].energia <= 0) {
-                this.populacao.splice(i, 1);
-                s.checarBordas(this.largura, this.altura);
-            }
-        }
+    // Ciclo das Presas
+    for (let i = this.populacao.length - 1; i >= 0; i--) {
+        let s = this.populacao[i]; // Definimos 's' aqui
+        s.viver(this.comidas, this.predadores);
+        
+        // CORREÇÃO: Chamar checarBordas SEMPRE, não só quando morre
+        s.checarBordas(this.largura, this.altura);
 
-        // Ciclo dos Predadores
-        for (let i = this.predadores.length - 1; i >= 0; i--) {
-            this.predadores[i].viver(this.populacao);
-            if (this.predadores[i].energia <= 0) {
-                this.predadores.splice(i, 1);
-                p.checarBordas(this.largura, this.altura); // <--- Adicione esta linha
-            }
+        if (s.energia <= 0) {
+            this.populacao.splice(i, 1);
         }
+    }
+
+    // Ciclo dos Predadores
+    for (let i = this.predadores.length - 1; i >= 0; i--) {
+        let p = this.predadores[i]; // Definimos 'p' aqui
+        p.viver(this.populacao);
+        
+        // CORREÇÃO: Chamar checarBordas para o predador também atravessar
+        p.checarBordas(this.largura, this.altura);
+
+        if (p.energia <= 0) {
+            this.predadores.splice(i, 1);
+        }
+    }
+
+    // Taxa de aparecimento de comida
+    if (Math.random() < 0.05) {
+        this.gerarComida();
+    }
+}
 
         // Taxa de aparecimento de comida (5%)
         if (Math.random() < 0.05) {
@@ -91,4 +105,5 @@ export default class Mundo {
         this.ctx.shadowBlur = 0;
     }
 }
+
 
