@@ -2,61 +2,37 @@ import Mundo from './mundo.js';
 import Ser from './ser.js';
 import Predador from './predador.js';
 
-
-
 const canvas = document.getElementById('simulador');
-canvas.width = window.innerWidth * 0.8;
-canvas.height = window.innerHeight * 0.8;
+canvas.width = 800;
+canvas.height = 600;
 
-const meuMundo = new Mundo(canvas);
+const meuMundo = new Mundo(canvas, 800, 600);
 
-
-//gera uma quantidade inicial de comida
-for (let i = 0; i < 50; i++) {
-    meuMundo.gerarComida();
+// Criar seres iniciais
+for(let i=0; i<20; i++) {
+    meuMundo.populacao.push(new Ser(Math.random()*800, Math.random()*600));
 }
 
-//cria as bolinhas iniciais
-for (let i = 0; i < 5; i++) {
-    meuMundo.populacao.push(new Ser(Math.random() * canvas.width, Math.random() * canvas.height));
-}
+canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Clique cria Predador
+    meuMundo.predadores.push(new Predador(x, y));
+});
 
-meuMundo.predadores.push(new Predador(100, 100));
 function loop() {
     meuMundo.atualizar();
     meuMundo.desenhar();
 
-    const elementoPresas = document.getElementById('count');
-    const elementoPredadores = document.getElementById('predCount');
-
-    if (elementoPresas) {
-        elementoPresas.innerText = meuMundo.populacao.length;
-    }
-    
-    if (elementoPredadores) {
-        elementoPredadores.innerText = meuMundo.predadores.length;
-    }
+    // Atualiza o HTML (Os IDs devem existir no seu index.html!)
+    const pPresas = document.getElementById('count');
+    const pPreds = document.getElementById('predCount');
+    if(pPresas) pPresas.innerText = meuMundo.populacao.length;
+    if(pPreds) pPreds.innerText = meuMundo.predadores.length;
 
     requestAnimationFrame(loop);
 }
 
-canvas.addEventListener('mousedown', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    if (event.button === 0) { 
-        // botão esquerdo cria o predador
-        meuMundo.predadores.push(new Predador(x, y));
-    } else if (event.button === 2) { 
-        // botão direito cria a presa
-        meuMundo.populacao.push(new Ser(x, y));
-    }
-});
-
-canvas.oncontextmenu = (e) => e.preventDefault();
-
-canvas.oncontextmenu = (e) => e.preventDefault();
-
 loop();
-
