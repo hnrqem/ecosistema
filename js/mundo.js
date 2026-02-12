@@ -1,38 +1,13 @@
-import Ser from './ser.js';
-
 export default class Mundo {
-    constructor(canvas) {
+    constructor(canvas, largura, altura) {
+        this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.largura = canvas.width;
-        this.altura = canvas.height;
+        this.largura = largura;
+        this.altura = altura;
         this.populacao = [];
-        this.comidas = [];
         this.predadores = [];
+        this.comidas = [];
     }
-
-    atualizar() {
-    //ciclo de vida das presas 
-    for (let i = this.populacao.length - 1; i >= 0; i--) {
-        this.populacao[i].viver(this.comidas);
-        if (this.populacao[i].energia <= 0) this.populacao.splice(i, 1);
-    }
-
-    //ciclo dos Predadores
-    for (let i = this.predadores.length - 1; i >= 0; i--) {
-        this.predadores[i].viver(this.populacao); 
-        
-        if (this.predadores[i].energia <= 0) {
-            this.predadores.splice(i, 1);
-        }
-    }
-
-    if (Math.random() < 0.15) this.gerarComida();
-}
-    // mundo.js -> no método atualizar()
-this.populacao.forEach(ser => {
-    // Passamos a comida E os predadores para o ser decidir o que fazer
-    ser.viver(this.comidas, this.predadores); 
-});
 
     gerarComida() {
         this.comidas.push({
@@ -41,72 +16,64 @@ this.populacao.forEach(ser => {
         });
     }
 
+    atualizar() {
+        // Ciclo das Presas
+        for (let i = this.populacao.length - 1; i >= 0; i--) {
+            this.populacao[i].viver(this.comidas, this.predadores);
+            if (this.populacao[i].energia <= 0) this.populacao.splice(i, 1);
+        }
+
+        // Ciclo dos Predadores
+        for (let i = this.predadores.length - 1; i >= 0; i--) {
+            this.predadores[i].viver(this.populacao);
+            if (this.predadores[i].energia <= 0) this.predadores.splice(i, 1);
+        }
+
+        if (Math.random() < 0.04) this.gerarComida(); // Menos comida
+    }
+
     desenhar() {
-    const gradient = this.ctx.createRadialGradient(
-        this.largura / 2, this.altura / 2, 50, 
-        this.largura / 2, this.altura / 2, this.largura
-    );
-    gradient.addColorStop(0, '#1a1a2e'); 
-    gradient.addColorStop(1, '#0f0f1b'); 
+        // Fundo Neon Gradiente
+        const grad = this.ctx.createRadialGradient(this.largura/2, this.altura/2, 0, this.largura/2, this.altura/2, this.largura);
+        grad.addColorStop(0, '#1a1a2e');
+        grad.addColorStop(1, '#020205');
+        this.ctx.fillStyle = grad;
+        this.ctx.globalAlpha = 0.3; // Rastro
+        this.ctx.fillRect(0, 0, this.largura, this.altura);
+        this.ctx.globalAlpha = 1.0;
 
-    this.ctx.fillStyle = gradient;
-    this.ctx.globalAlpha = 0.4; // rastro
-    this.ctx.fillRect(0, 0, this.largura, this.altura);
-    this.ctx.globalAlpha = 1.0;
+        this.ctx.shadowBlur = 0;
 
-    //comida
-this.ctx.shadowBlur = 10;
-this.ctx.shadowColor = '#4ae216';
+        // Comidas
+        this.comidas.forEach(c => {
+            this.ctx.fillStyle = '#4ae216';
+            this.ctx.beginPath();
+            this.ctx.arc(c.x, c.y, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
 
-//presas
-this.populacao.forEach(ser => {
-    this.ctx.shadowBlur = 15;
-    this.ctx.shadowColor = ser.dna.cor;
-});
+        // Presas (Círculos)
+        this.populacao.forEach(s => {
+            const r = Math.min(10, Math.max(2, s.energia / 15));
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = s.dna.cor;
+            this.ctx.fillStyle = s.dna.cor;
+            this.ctx.beginPath();
+            this.ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
 
-this.ctx.shadowBlur = 0;
-
-    //desenhar comidas (pontinhos verdes)
-    this.comidas.forEach(comida => {
-        this.ctx.fillStyle = '#4ae216';
-        this.ctx.beginPath();
-        this.ctx.arc(comida.x, comida.y, 3, 0, Math.PI * 2);
-        this.ctx.fill();
-    });
-
-    //desenhar dresas
-    this.populacao.forEach(ser => {
-        const tamanho = Math.max(2, ser.energia / 20);
-        this.ctx.fillStyle = ser.dna.cor;
-        this.ctx.beginPath();
-        this.ctx.arc(ser.x, ser.y, tamanho, 0, Math.PI * 2);
-        this.ctx.fill();
-    });
-
-    //desenhar predadores
-this.predadores.forEach(predador => {
-    const tamanho = Math.max(4, predador.energia / 15);
-    
-    this.ctx.fillStyle = predador.dna.cor;
-    
-    //forma predadores
-    this.ctx.fillRect(
-        predador.x - tamanho, 
-        predador.y - tamanho, 
-        tamanho * 2, 
-        tamanho * 2
-    );
-
-    // borda branca
-    this.ctx.strokeStyle = 'white';
-    this.ctx.strokeRect(
-        predador.x - tamanho, 
-        predador.y - tamanho, 
-        tamanho * 2, 
-        tamanho * 2
-    );
-});
+        // Predadores (Quadrados Neon)
+        this.predadores.forEach(p => {
+            const tam = Math.min(12, Math.max(4, p.energia / 12));
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = '#ff0000';
+            this.ctx.fillStyle = '#ff0000';
+            this.ctx.fillRect(p.x - tam, p.y - tam, tam*2, tam*2);
+            this.ctx.strokeStyle = 'white';
+            this.ctx.strokeRect(p.x - tam, p.y - tam, tam*2, tam*2);
+        });
+        
+        this.ctx.shadowBlur = 0;
+    }
 }
-}
-
-
