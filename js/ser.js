@@ -7,7 +7,7 @@ export default class Ser {
         this.alturaMundo = 800;
         
         this.dna = dna || {
-            velocidade: Math.random() * 2 + 1,
+            velocidade: Math.random() * 1 + 1,
             raioVisao: Math.random() * 100 + 100,
             cor: `hsl(${Math.random() * 280 + 40}, 70%, 50%)`
         };
@@ -54,8 +54,8 @@ export default class Ser {
     fugir(ameaca) {
         const v = this.obterVetorCurto(ameaca.x, ameaca.y);
         if (v.dist > 0) {
-            this.x -= (v.dx / v.dist) * this.dna.velocidade * 1.3;
-            this.y -= (v.dy / v.dist) * this.dna.velocidade * 1.3;
+            this.x -= (v.dx / v.dist) * this.dna.velocidade * 0.5;
+            this.y -= (v.dy / v.dist) * this.dna.velocidade * 0.5;
         }
     }
 
@@ -108,3 +108,4 @@ export default class Ser {
         else if (this.y < 0) this.y = this.alturaMundo;
     }
 }
+
