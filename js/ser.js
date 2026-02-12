@@ -3,8 +3,9 @@ export default class Ser {
         this.x = x;
         this.y = y;
         this.energia = 100;
+        this.larguraMundo = 1100;
+        this.alturaMundo = 800;
         
-        // DNA: Atributos genéticos
         this.dna = dna || {
             velocidade: Math.random() * 2 + 1,
             raioVisao: Math.random() * 100 + 100,
@@ -13,15 +14,12 @@ export default class Ser {
     }
 
     viver(listaComida, listaPredadores) {
-        this.energia -= 0.15; // Metabolismo base
-
-        // 1. Prioridade máxima: Fugir de predadores
+        this.energia -= 0.15;
         let ameaca = this.detectarAmeaca(listaPredadores);
         if (ameaca) {
             this.fugir(ameaca);
-            this.energia -= 0.1; // Fuga consome energia extra
+            this.energia -= 0.1;
         } else {
-            // 2. Se estiver seguro, busca comida
             let alvo = this.buscarComida(listaComida);
             if (alvo) {
                 this.moverPara(alvo);
@@ -32,87 +30,68 @@ export default class Ser {
         }
     }
 
-    // Calcula distância considerando o "atalho" pelas bordas
-    obterDistanciaToroidal(alvoX, alvoY) {
-        const LARGURA = 1100;
-        const ALTURA = 800;
-        let dx = Math.abs(alvoX - this.x);
-        let dy = Math.abs(alvoY - this.y);
+    // Calcula a direção mais curta (considerando a borda)
+    obterVetorCurto(alvoX, alvoY) {
+        let dx = alvoX - this.x;
+        let dy = alvoY - this.y;
 
-        if (dx > LARGURA / 2) dx = LARGURA - dx;
-        if (dy > ALTURA / 2) dy = ALTURA - dy;
-
+        if (Math.abs(dx) > this.larguraMundo / 2) {
+            dx = dx > 0 ? dx - this.larguraMundo : dx + this.larguraMundo;
+        }
+        if (Math.abs(dy) > this.alturaMundo / 2) {
+            dy = dy > 0 ? dy - this.alturaMundo : dy + this.alturaMundo;
+        }
         return { dx, dy, dist: Math.hypot(dx, dy) };
     }
 
-    detectarAmeaca(listaPredadores) {
-        let ameacaMaisProxima = null;
-        let distMinima = this.dna.raioVisao * 0.7;
-
-        for (let p of listaPredadores) {
-            const info = this.obterDistanciaToroidal(p.x, p.y);
-            if (info.dist < distMinima) {
-                distMinima = info.dist;
-                ameacaMaisProxima = p;
-            }
+    moverPara(alvo) {
+        const vetor = this.obterVetorCurto(alvo.x, alvo.y);
+        if (vetor.dist > 0) {
+            this.x += (vetor.dx / vetor.dist) * this.dna.velocidade;
+            this.y += (vetor.dy / vetor.dist) * this.dna.velocidade;
         }
-        return ameacaMaisProxima;
     }
 
     fugir(ameaca) {
-        const LARGURA = 1100;
-        const ALTURA = 800;
-
-        let dx = this.x - ameaca.x;
-        let dy = this.y - ameaca.y;
-
-        // Se o predador está do outro lado da borda, ajustamos o vetor de fuga
-        if (Math.abs(dx) > LARGURA / 2) dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
-        if (Math.abs(dy) > ALTURA / 2) dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
-
-        let dist = Math.hypot(dx, dy);
-        if (dist > 0) {
-            this.x += (dx / dist) * this.dna.velocidade * 1.3;
-            this.y += (dy / dist) * this.dna.velocidade * 1.3;
+        const vetor = this.obterVetorCurto(ameaca.x, ameaca.y);
+        if (vetor.dist > 0) {
+            // Foge na direção oposta do vetor curto
+            this.x -= (vetor.dx / vetor.dist) * this.dna.velocidade * 1.3;
+            this.y -= (vetor.dy / vetor.dist) * this.dna.velocidade * 1.3;
         }
     }
 
     buscarComida(listaComida) {
         let alvo = null;
         let dMin = this.dna.raioVisao;
-
         listaComida.forEach(c => {
-            const info = this.obterDistanciaToroidal(c.x, c.y);
-            if (info.dist < dMin) {
-                dMin = info.dist;
+            const vetor = this.obterVetorCurto(c.x, c.y);
+            if (vetor.dist < dMin) {
+                dMin = vetor.dist;
                 alvo = c;
             }
         });
         return alvo;
     }
 
-    moverPara(alvo) {
-        const LARGURA = 1100;
-        const ALTURA = 800;
-
-        let dx = alvo.x - this.x;
-        let dy = alvo.y - this.y;
-
-        // Lógica de atalho pela borda
-        if (Math.abs(dx) > LARGURA / 2) dx = dx > 0 ? dx - LARGURA : dx + LARGURA;
-        if (Math.abs(dy) > ALTURA / 2) dy = dy > 0 ? dy - ALTURA : dy + ALTURA;
-
-        let dist = Math.hypot(dx, dy);
-        if (dist > 0) {
-            this.x += (dx / dist) * this.dna.velocidade;
-            this.y += (dy / dist) * this.dna.velocidade;
-        }
+    detectarAmeaca(listaPredadores) {
+        let ameaca = null;
+        let dMin = this.dna.raioVisao * 0.7;
+        listaPredadores.forEach(p => {
+            const vetor = this.obterVetorCurto(p.x, p.y);
+            if (vetor.dist < dMin) {
+                dMin = vetor.dist;
+                ameaca = p;
+            }
+        });
+        return ameaca;
     }
 
     tentarComer(alvo, lista) {
-        const info = this.obterDistanciaToroidal(alvo.x, alvo.y);
-        if (info.dist < 5) {
-            lista.splice(lista.indexOf(alvo), 1);
+        const vetor = this.obterVetorCurto(alvo.x, alvo.y);
+        if (vetor.dist < 5) {
+            const index = lista.indexOf(alvo);
+            if (index > -1) lista.splice(index, 1);
             this.energia += 30;
         }
     }
@@ -122,9 +101,10 @@ export default class Ser {
         this.y += (Math.random() - 0.5) * 2;
     }
 
-    checarBordas(largura, altura) {
-        if (this.x > largura) this.x = 0;
-        if (this.x < 0) this.x = largura;
-        if (this.y > altura) this.y = 0;
-        if (this.y < 0) this.y = altura;
+    checarBordas() {
+        if (this.x > this.larguraMundo) this.x = 0;
+        if (this.x < 0) this.x = this.larguraMundo;
+        if (this.y > this.alturaMundo) this.y = 0;
+        if (this.y < 0) this.y = this.alturaMundo;
     }
+}
