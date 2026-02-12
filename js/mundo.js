@@ -17,7 +17,7 @@ export default class Mundo {
     }
 
     atualizar() {
-        // Ciclo Presas
+        // Atualiza Presas
         for (let i = this.populacao.length - 1; i >= 0; i--) {
             let s = this.populacao[i];
             s.viver(this.comidas, this.predadores);
@@ -25,7 +25,7 @@ export default class Mundo {
             if (s.energia <= 0) this.populacao.splice(i, 1);
         }
 
-        // Ciclo Predadores
+        // Atualiza Predadores
         for (let i = this.predadores.length - 1; i >= 0; i--) {
             let p = this.predadores[i];
             p.viver(this.populacao);
@@ -37,11 +37,11 @@ export default class Mundo {
     }
 
     desenhar() {
-        // Rastro escuro
+        // Fundo
         this.ctx.fillStyle = 'rgba(10, 10, 30, 0.3)';
         this.ctx.fillRect(0, 0, this.largura, this.altura);
 
-        // Comida
+        // Desenha Comida
         this.ctx.fillStyle = '#4ae216';
         this.comidas.forEach(c => {
             this.ctx.beginPath();
@@ -49,7 +49,7 @@ export default class Mundo {
             this.ctx.fill();
         });
 
-        // Presas
+        // Desenha Presas
         this.populacao.forEach(s => {
             this.ctx.fillStyle = s.dna.cor;
             this.ctx.beginPath();
@@ -57,7 +57,7 @@ export default class Mundo {
             this.ctx.fill();
         });
 
-        // Predadores
+        // Desenha Predadores
         this.ctx.fillStyle = '#ff0000';
         this.predadores.forEach(p => {
             this.ctx.fillRect(p.x - 6, p.y - 6, 12, 12);
