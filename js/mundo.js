@@ -28,6 +28,11 @@ export default class Mundo {
 
     if (Math.random() < 0.15) this.gerarComida();
 }
+    // mundo.js -> no método atualizar()
+this.populacao.forEach(ser => {
+    // Passamos a comida E os predadores para o ser decidir o que fazer
+    ser.viver(this.comidas, this.predadores); 
+});
 
     gerarComida() {
         this.comidas.push({
@@ -103,4 +108,5 @@ this.predadores.forEach(predador => {
 });
 }
 }
+
 
