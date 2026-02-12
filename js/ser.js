@@ -66,6 +66,25 @@ export default class Ser {
         this.x += (Math.random() - 0.5) * this.dna.velocidade;
         this.y += (Math.random() - 0.5) * this.dna.velocidade;
     }
+    // Dentro da classe Ser em ser.js
+    fugir(ameaca) {
+        // 1. Calcula a direção para longe do predador
+        let dx = this.x - ameaca.x;
+        let dy = this.y - ameaca.y;
+        
+        // 2. Normaliza a distância (pitágoras)
+        let distancia = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distancia > 0) {
+            // Move-se na direção oposta multiplicada pela velocidade
+            // Adicionamos um bônus de velocidade para a "adrenalina" da fuga
+            const velocidadeFuga = this.dna.velocidade * 1.2;
+            this.x += (dx / distancia) * velocidadeFuga;
+            this.y += (dy / distancia) * velocidadeFuga;
+        }
+    }
+
+    
 
     // Dentro da classe Ser no arquivo ser.js
 
@@ -90,3 +109,4 @@ tentarReproduzir() {
     return null;
 }
 }
+
