@@ -30,6 +30,7 @@ export default class Ser {
         }
     }
 
+    // A lógica mágica para atravessar a borda
     obterVetorCurto(alvoX, alvoY) {
         let dx = alvoX - this.x;
         let dy = alvoY - this.y;
@@ -89,8 +90,10 @@ export default class Ser {
         const v = this.obterVetorCurto(alvo.x, alvo.y);
         if (v.dist < 7) {
             const i = lista.indexOf(alvo);
-            if (i > -1) lista.splice(i, 1);
-            this.energia += 30;
+            if (i > -1) {
+                lista.splice(i, 1);
+                this.energia += 30;
+            }
         }
     }
 
@@ -101,8 +104,8 @@ export default class Ser {
 
     checarBordas() {
         if (this.x > this.larguraMundo) this.x = 0;
-        if (this.x < 0) this.x = this.larguraMundo;
+        else if (this.x < 0) this.x = this.larguraMundo;
         if (this.y > this.alturaMundo) this.y = 0;
-        if (this.y < 0) this.y = this.alturaMundo;
+        else if (this.y < 0) this.y = this.alturaMundo;
     }
 }
