@@ -30,7 +30,6 @@ export default class Ser {
         }
     }
 
-    // Calcula a direção mais curta (considerando a borda)
     obterVetorCurto(alvoX, alvoY) {
         let dx = alvoX - this.x;
         let dy = alvoY - this.y;
@@ -45,19 +44,18 @@ export default class Ser {
     }
 
     moverPara(alvo) {
-        const vetor = this.obterVetorCurto(alvo.x, alvo.y);
-        if (vetor.dist > 0) {
-            this.x += (vetor.dx / vetor.dist) * this.dna.velocidade;
-            this.y += (vetor.dy / vetor.dist) * this.dna.velocidade;
+        const v = this.obterVetorCurto(alvo.x, alvo.y);
+        if (v.dist > 0) {
+            this.x += (v.dx / v.dist) * this.dna.velocidade;
+            this.y += (v.dy / v.dist) * this.dna.velocidade;
         }
     }
 
     fugir(ameaca) {
-        const vetor = this.obterVetorCurto(ameaca.x, ameaca.y);
-        if (vetor.dist > 0) {
-            // Foge na direção oposta do vetor curto
-            this.x -= (vetor.dx / vetor.dist) * this.dna.velocidade * 1.3;
-            this.y -= (vetor.dy / vetor.dist) * this.dna.velocidade * 1.3;
+        const v = this.obterVetorCurto(ameaca.x, ameaca.y);
+        if (v.dist > 0) {
+            this.x -= (v.dx / v.dist) * this.dna.velocidade * 1.3;
+            this.y -= (v.dy / v.dist) * this.dna.velocidade * 1.3;
         }
     }
 
@@ -65,9 +63,9 @@ export default class Ser {
         let alvo = null;
         let dMin = this.dna.raioVisao;
         listaComida.forEach(c => {
-            const vetor = this.obterVetorCurto(c.x, c.y);
-            if (vetor.dist < dMin) {
-                dMin = vetor.dist;
+            const v = this.obterVetorCurto(c.x, c.y);
+            if (v.dist < dMin) {
+                dMin = v.dist;
                 alvo = c;
             }
         });
@@ -78,9 +76,9 @@ export default class Ser {
         let ameaca = null;
         let dMin = this.dna.raioVisao * 0.7;
         listaPredadores.forEach(p => {
-            const vetor = this.obterVetorCurto(p.x, p.y);
-            if (vetor.dist < dMin) {
-                dMin = vetor.dist;
+            const v = this.obterVetorCurto(p.x, p.y);
+            if (v.dist < dMin) {
+                dMin = v.dist;
                 ameaca = p;
             }
         });
@@ -88,10 +86,10 @@ export default class Ser {
     }
 
     tentarComer(alvo, lista) {
-        const vetor = this.obterVetorCurto(alvo.x, alvo.y);
-        if (vetor.dist < 5) {
-            const index = lista.indexOf(alvo);
-            if (index > -1) lista.splice(index, 1);
+        const v = this.obterVetorCurto(alvo.x, alvo.y);
+        if (v.dist < 7) {
+            const i = lista.indexOf(alvo);
+            if (i > -1) lista.splice(i, 1);
             this.energia += 30;
         }
     }
