@@ -3,10 +3,10 @@ import Ser from './ser.js';
 import Predador from './predador.js';
 
 const canvas = document.getElementById('simulador');
-canvas.width = 800;
-canvas.height = 600;
+canvas.width = 1100;
+canvas.height = 800;
 
-const meuMundo = new Mundo(canvas, 800, 600);
+const meuMundo = new Mundo(canvas, 1100, 800);
 
 // Criar seres iniciais
 for(let i=0; i<20; i++) {
@@ -36,3 +36,4 @@ function loop() {
 }
 
 loop();
+
