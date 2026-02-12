@@ -9,8 +9,10 @@ canvas.height = 800;
 const meuMundo = new Mundo(canvas, 1100, 800);
 
 // Criar seres iniciais
+// No seu main.js, mude o loop de criação inicial:
 for(let i=0; i<20; i++) {
-    meuMundo.populacao.push(new Ser(Math.random()*800, Math.random()*600));
+    // Agora usando as medidas totais do seu novo canvas
+    meuMundo.populacao.push(new Ser(Math.random() * 1100, Math.random() * 800));
 }
 
 canvas.addEventListener('mousedown', (e) => {
@@ -36,4 +38,5 @@ function loop() {
 }
 
 loop();
+
 
