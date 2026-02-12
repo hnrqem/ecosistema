@@ -12,11 +12,19 @@ export default class Ser {
         };
     }
 
-    viver(listaComida) {
-        this.energia -= 0.15; 
-        
-        const alvo = this.buscarComida(listaComida);
-        
+    // Atualize o método viver no ser.js
+viver(listaComida, listaPredadores) {
+    this.energia -= 0.1; // Custo de vida
+
+    // 1. Verificar se há perigo por perto
+    let perigo = this.detectarAmeaca(listaPredadores);
+
+    if (perigo) {
+        this.fugir(perigo);
+        this.energia -= 0.1; // Fugir gasta mais energia!
+    } else {
+        // 2. Se não houver perigo, busca comida normalmente
+        let alvo = this.buscarComida(listaComida);
         if (alvo) {
             this.moverPara(alvo);
             this.tentarComer(alvo, listaComida);
@@ -24,6 +32,21 @@ export default class Ser {
             this.vagar();
         }
     }
+}
+
+detectarAmeaca(listaPredadores) {
+    let ameacaMaisProxima = null;
+    let distMinima = this.dna.raioVisao * 0.8; // Só foge se estiver bem perto
+
+    for (let p of listaPredadores) {
+        let d = Math.sqrt((p.x - this.x) ** 2 + (p.y - this.y) ** 2);
+        if (d < distMinima) {
+            distMinima = d;
+            ameacaMaisProxima = p;
+        }
+    }
+    return ameacaMaisProxima;
+}
 
     buscarComida(listaComida) {
         let maisProxima = null;
@@ -109,4 +132,5 @@ tentarReproduzir() {
     return null;
 }
 }
+
 
