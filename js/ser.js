@@ -57,23 +57,38 @@ export default class Ser {
         }
     }
 
-    buscarComida(listaComida) {
-        let alvo = null;
-        let dMin = this.dna.raioVisao;
-        listaComida.forEach(c => {
-            let d = Math.hypot(c.x - this.x, c.y - this.y);
-            if (d < dMin) { dMin = d; alvo = c; }
-        });
-        return alvo;
+    // ser.js
+
+// Novo método para calcular a distância levando em conta as bordas
+distanciaToroidal(alvoX, alvoY) {
+    let dx = Math.abs(alvoX - this.x);
+    let dy = Math.abs(alvoY - this.y);
+
+    // Se a distância for maior que metade da tela, o caminho mais curto é pelo outro lado
+    if (dx > this.largura / 2) dx = this.largura - dx;
+    if (dy > this.altura / 2) dy = this.altura - dy;
+
+    return Math.hypot(dx, dy);
+}
+
+moverPara(alvo) {
+    let dx = alvo.x - this.x;
+    let dy = alvo.y - this.y;
+
+    // Ajuste para atravessar a borda horizontal
+    if (Math.abs(dx) > this.largura / 2) {
+        this.x -= Math.sign(dx) * this.dna.velocidade;
+    } else {
+        this.x += Math.sign(dx) * this.dna.velocidade;
     }
 
-    moverPara(alvo) {
-        let dx = alvo.x - this.x;
-        let dy = alvo.y - this.y;
-        let dist = Math.hypot(dx, dy);
-        this.x += (dx / dist) * this.dna.velocidade;
-        this.y += (dy / dist) * this.dna.velocidade;
+    // Ajuste para atravessar a borda vertical
+    if (Math.abs(dy) > this.altura / 2) {
+        this.y -= Math.sign(dy) * this.dna.velocidade;
+    } else {
+        this.y += Math.sign(dy) * this.dna.velocidade;
     }
+}
 
     tentarComer(alvo, lista) {
         if (Math.hypot(alvo.x - this.x, alvo.y - this.y) < 5) {
@@ -95,3 +110,4 @@ export default class Ser {
         if (this.y < 0) this.y = altura;
     }
 }
+
