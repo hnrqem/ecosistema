@@ -21,6 +21,7 @@ export default class Ser {
 
         if (ameaca) {
             this.fugir(ameaca);
+            this.energia -= 0.1; // fugir custa mais energia
         } else {
             let alvo = this.buscarComida(listaComida);
 
@@ -33,9 +34,24 @@ export default class Ser {
         }
     }
 
+    // 🔥 Vetor curto para mundo com wrap (tipo Pac-Man)
+    obterVetorCurto(alvoX, alvoY) {
+        let dx = alvoX - this.x;
+        let dy = alvoY - this.y;
+
+        if (Math.abs(dx) > this.larguraMundo / 2) {
+            dx = dx > 0 ? dx - this.larguraMundo : dx + this.larguraMundo;
+        }
+
+        if (Math.abs(dy) > this.alturaMundo / 2) {
+            dy = dy > 0 ? dy - this.alturaMundo : dy + this.alturaMundo;
+        }
+
+        return { dx, dy };
+    }
+
     moverPara(alvo) {
-        const dx = alvo.x - this.x;
-        const dy = alvo.y - this.y;
+        const { dx, dy } = this.obterVetorCurto(alvo.x, alvo.y);
         const dist = Math.hypot(dx, dy);
 
         if (dist > 0) {
@@ -45,8 +61,7 @@ export default class Ser {
     }
 
     fugir(ameaca) {
-        const dx = ameaca.x - this.x;
-        const dy = ameaca.y - this.y;
+        const { dx, dy } = this.obterVetorCurto(ameaca.x, ameaca.y);
         const dist = Math.hypot(dx, dy);
 
         if (dist > 0) {
@@ -57,15 +72,14 @@ export default class Ser {
 
     buscarComida(lista) {
         let alvo = null;
-        let dMin = this.dna.raioVisao;
+        let dMin2 = this.dna.raioVisao * this.dna.raioVisao;
 
         for (let i = 0; i < lista.length; i++) {
-            const dx = lista[i].x - this.x;
-            const dy = lista[i].y - this.y;
-            const dist = Math.hypot(dx, dy);
+            const { dx, dy } = this.obterVetorCurto(lista[i].x, lista[i].y);
+            const dist2 = dx * dx + dy * dy;
 
-            if (dist < dMin) {
-                dMin = dist;
+            if (dist2 < dMin2) {
+                dMin2 = dist2;
                 alvo = lista[i];
             }
         }
@@ -75,15 +89,14 @@ export default class Ser {
 
     detectarAmeaca(lista) {
         let ameaca = null;
-        let dMin = this.dna.raioVisao * 0.7;
+        let dMin2 = (this.dna.raioVisao * 0.7) ** 2;
 
         for (let i = 0; i < lista.length; i++) {
-            const dx = lista[i].x - this.x;
-            const dy = lista[i].y - this.y;
-            const dist = Math.hypot(dx, dy);
+            const { dx, dy } = this.obterVetorCurto(lista[i].x, lista[i].y);
+            const dist2 = dx * dx + dy * dy;
 
-            if (dist < dMin) {
-                dMin = dist;
+            if (dist2 < dMin2) {
+                dMin2 = dist2;
                 ameaca = lista[i];
             }
         }
@@ -92,11 +105,10 @@ export default class Ser {
     }
 
     tentarComer(alvo, lista) {
-        const dx = alvo.x - this.x;
-        const dy = alvo.y - this.y;
-        const dist = Math.hypot(dx, dy);
+        const { dx, dy } = this.obterVetorCurto(alvo.x, alvo.y);
+        const dist2 = dx * dx + dy * dy;
 
-        if (dist < 7) {
+        if (dist2 < 7 * 7) {
             const i = lista.indexOf(alvo);
             if (i > -1) {
                 lista.splice(i, 1);
@@ -106,8 +118,8 @@ export default class Ser {
     }
 
     vagar() {
-        this.x += (Math.random() - 0.5) * 2;
-        this.y += (Math.random() - 0.5) * 2;
+        this.x += (Math.random() - 0.5) * this.dna.velocidade;
+        this.y += (Math.random() - 0.5) * this.dna.velocidade;
     }
 
     checarBordas() {
