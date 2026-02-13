@@ -13,7 +13,7 @@ export default class Predador extends Ser {
     }
 
     viver(listaPresas) {
-        this.energia -= 1.1;
+        this.energia -= 0.2;
 
         let alvo = this.buscarComida(listaPresas);
 
@@ -38,3 +38,4 @@ export default class Predador extends Ser {
         }
     }
 }
+
