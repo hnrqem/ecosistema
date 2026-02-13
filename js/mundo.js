@@ -52,9 +52,26 @@ export default class Mundo {
             this.ctx.fill();
         });
 
+        // mundo.js - dentro do desenhar()
+
+        // Desenha Presas
+        this.populacao.forEach(s => {
+            // O tamanho agora varia entre 2 e 8 dependendo da energia
+            const tamanho = Math.max(2, s.energia / 20); 
+            this.ctx.fillStyle = s.dna.cor;
+            this.ctx.beginPath();
+            this.ctx.arc(s.x, s.y, tamanho, 0, Math.PI * 2);
+            this.ctx.fill();
+        });
+        
+        // Desenha Predadores
         this.ctx.fillStyle = '#ff0000';
         this.predadores.forEach(p => {
-            this.ctx.fillRect(p.x - 6, p.y - 6, 12, 12);
+            // O tamanho do quadrado varia conforme a energia
+            const tamPred = Math.max(4, p.energy / 10);
+            this.ctx.fillRect(p.x - tamPred, p.y - tamPred, tamPred * 2, tamPred * 2);
         });
+        
     }
 }
+
