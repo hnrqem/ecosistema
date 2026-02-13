@@ -7,15 +7,23 @@
 </head>
 <body>
 
-    <h1>Simulador de Ecossistema</h1>
+    <div class="container">
 
-    <div id="painel">
-    Presas: <span id="count">0</span> | 
-    Predadores: <span id="predCount">0</span>
-</div>
-    
+        <h1>🌍 Simulador de Ecossistema</h1>
 
-    <canvas id="simulador"></canvas>
+        <div id="painel">
+            <div>🟢 Presas: <span id="count">0</span></div>
+            <div>🔴 Predadores: <span id="predCount">0</span></div>
+            <div>🌱 Comida: <span id="foodCount">0</span></div>
+        </div>
+
+        <canvas id="simulador"></canvas>
+
+        <p class="info">
+            Clique esquerdo: criar Presa | Clique direito: criar Predador
+        </p>
+
+    </div>
 
     <script type="module" src="js/main.js"></script>
 </body>
