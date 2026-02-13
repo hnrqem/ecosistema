@@ -2,7 +2,7 @@ export default class Ser {
     constructor(x, y, dna) {
         this.x = x;
         this.y = y;
-        this.energia = 100;
+        this.energia = 250;
 
         this.larguraMundo = 1100;
         this.alturaMundo = 800;
@@ -129,4 +129,5 @@ export default class Ser {
         if (this.y < 0) this.y = this.alturaMundo;
     }
 }
+
 
