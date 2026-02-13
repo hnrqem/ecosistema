@@ -15,23 +15,25 @@ for (let i = 0; i < 20; i++) {
     );
 }
 
-// 🔥 Limite para evitar explosão
-const MAX_SERES = 250;
-const MAX_PREDADORES = 80;
+const MAX_SERES = 300;
+const MAX_PREDADORES = 100;
 
-canvas.addEventListener('click', (e) => {
+// Clique do mouse
+canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Clique esquerdo cria presa
-    if (e.button === 0 && meuMundo.populacao.length < MAX_SERES) {
-        meuMundo.populacao.push(new Ser(x, y));
+    if (e.button === 0) { // ESQUERDO = Presa
+        if (meuMundo.populacao.length < MAX_SERES) {
+            meuMundo.populacao.push(new Ser(x, y));
+        }
     }
 
-    // Clique direito cria predador
-    if (e.button === 2 && meuMundo.predadores.length < MAX_PREDADORES) {
-        meuMundo.predadores.push(new Predador(x, y));
+    if (e.button === 2) { // DIREITO = Predador
+        if (meuMundo.predadores.length < MAX_PREDADORES) {
+            meuMundo.predadores.push(new Predador(x, y));
+        }
     }
 });
 
@@ -42,11 +44,9 @@ function loop() {
     meuMundo.atualizar();
     meuMundo.desenhar();
 
-    const pPresas = document.getElementById('count');
-    const pPreds = document.getElementById('predCount');
-
-    if (pPresas) pPresas.innerText = meuMundo.populacao.length;
-    if (pPreds) pPreds.innerText = meuMundo.predadores.length;
+    document.getElementById('count').innerText = meuMundo.populacao.length;
+    document.getElementById('predCount').innerText = meuMundo.predadores.length;
+    document.getElementById('foodCount').innerText = meuMundo.comidas.length;
 
     requestAnimationFrame(loop);
 }
