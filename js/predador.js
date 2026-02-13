@@ -3,7 +3,7 @@ import Ser from './ser.js';
 export default class Predador extends Ser {
     constructor(x, y) {
         super(x, y);
-        this.energia = 150;
+        this.energia = 350;
 
         this.dna = {
             velocidade: 2.2,
@@ -38,4 +38,5 @@ export default class Predador extends Ser {
         }
     }
 }
+
 
