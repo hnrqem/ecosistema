@@ -15,7 +15,7 @@ export default class Ser {
     }
 
     viver(listaComida, listaPredadores) {
-        this.energia -= 0.15;
+        this.energia -= 0.1;
 
         let ameaca = this.detectarAmeaca(listaPredadores);
 
@@ -129,3 +129,4 @@ export default class Ser {
         if (this.y < 0) this.y = this.alturaMundo;
     }
 }
+
