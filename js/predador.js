@@ -4,6 +4,7 @@ export default class Predador extends Ser {
     constructor(x, y) {
         super(x, y);
         this.energia = 150;
+
         this.dna = {
             velocidade: 2.2,
             raioVisao: 350,
@@ -12,9 +13,10 @@ export default class Predador extends Ser {
     }
 
     viver(listaPresas) {
-        this.energia -= 1.1; // Predador gasta energia muito rápido
+        this.energia -= 1.1;
 
-        let alvo = this.buscarComida(listaPresas); // Busca seres em vez de pontos verdes
+        let alvo = this.buscarComida(listaPresas);
+
         if (alvo) {
             this.moverPara(alvo);
             this.tentarComerPresa(alvo, listaPresas);
@@ -24,10 +26,15 @@ export default class Predador extends Ser {
     }
 
     tentarComerPresa(alvo, lista) {
-        if (Math.hypot(alvo.x - this.x, alvo.y - this.y) < 10) {
-            lista.splice(lista.indexOf(alvo), 1);
-            this.energia += 70; // Grande bônus por capturar presa
+        const dx = alvo.x - this.x;
+        const dy = alvo.y - this.y;
+
+        if (Math.hypot(dx, dy) < 10) {
+            const index = lista.indexOf(alvo);
+            if (index > -1) {
+                lista.splice(index, 1);
+                this.energia += 70;
+            }
         }
     }
 }
-
