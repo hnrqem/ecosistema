@@ -9,7 +9,7 @@ export default class Mundo {
         this.predadores = [];
         this.comidas = [];
 
-        this.MAX_COMIDA = 200;
+        this.MAX_COMIDA = 250;
     }
 
     gerarComida() {
@@ -22,7 +22,7 @@ export default class Mundo {
     }
 
     atualizar() {
-        // PRESAS
+
         for (let i = this.populacao.length - 1; i >= 0; i--) {
             let s = this.populacao[i];
             s.viver(this.comidas, this.predadores);
@@ -33,7 +33,6 @@ export default class Mundo {
             }
         }
 
-        // PREDADORES
         for (let i = this.predadores.length - 1; i >= 0; i--) {
             let p = this.predadores[i];
             p.viver(this.populacao);
@@ -48,7 +47,8 @@ export default class Mundo {
     }
 
     desenhar() {
-        this.ctx.fillStyle = 'rgba(10, 10, 30, 0.4)';
+        // Fundo com leve rastro
+        this.ctx.fillStyle = 'rgba(8, 8, 20, 0.35)';
         this.ctx.fillRect(0, 0, this.largura, this.altura);
 
         // Comida
@@ -56,33 +56,44 @@ export default class Mundo {
             const c = this.comidas[i];
             this.ctx.fillStyle = '#4ae216';
             this.ctx.beginPath();
-            this.ctx.arc(c.x, c.y, 2, 0, Math.PI * 2);
+            this.ctx.arc(c.x, c.y, 3, 0, Math.PI * 2);
             this.ctx.fill();
         }
 
-        // Presas
+        // Presas (MAIORES visualmente)
         for (let i = 0; i < this.populacao.length; i++) {
             const s = this.populacao[i];
-            const tamanho = Math.max(2, s.energia / 25);
+
+            const tamanhoBase = 6; // 🔥 maior que antes
+            const tamanhoEnergia = Math.max(0, s.energia / 40);
+            const tamanhoFinal = tamanhoBase + tamanhoEnergia;
 
             this.ctx.fillStyle = s.dna.cor;
             this.ctx.beginPath();
-            this.ctx.arc(s.x, s.y, tamanho, 0, Math.PI * 2);
+            this.ctx.arc(s.x, s.y, tamanhoFinal, 0, Math.PI * 2);
             this.ctx.fill();
         }
 
         // Predadores
         for (let i = 0; i < this.predadores.length; i++) {
             const p = this.predadores[i];
-            const tamPred = Math.max(4, p.energia / 20);
 
-            this.ctx.fillStyle = '#ff0000';
+            const tamanhoBase = 8;
+            const tamanhoEnergia = Math.max(0, p.energia / 35);
+            const tam = tamanhoBase + tamanhoEnergia;
+
+            this.ctx.fillStyle = '#ff2b2b';
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = '#ff0000';
+
             this.ctx.fillRect(
-                p.x - tamPred,
-                p.y - tamPred,
-                tamPred * 2,
-                tamPred * 2
+                p.x - tam,
+                p.y - tam,
+                tam * 2,
+                tam * 2
             );
+
+            this.ctx.shadowBlur = 0;
         }
     }
 }
