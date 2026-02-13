@@ -16,6 +16,7 @@ for(let i=0; i<20; i++) {
 }
 
 canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -26,12 +27,13 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mouseup', (e) => {
+    e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Clique cria Predador
-    meuMundo.predadores.push(new Ser(x, y));
+    // Clique cria ser
+    meuMundo.populacao.push(new Ser(x, y));
     
 });
 
@@ -49,6 +51,7 @@ function loop() {
 }
 
 loop();
+
 
 
 
