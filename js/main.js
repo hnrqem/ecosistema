@@ -22,6 +22,17 @@ canvas.addEventListener('mousedown', (e) => {
     
     // Clique cria Predador
     meuMundo.predadores.push(new Predador(x, y));
+    
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Clique cria Predador
+    meuMundo.predadores.push(new Ser(x, y));
+    
 });
 
 function loop() {
@@ -38,5 +49,6 @@ function loop() {
 }
 
 loop();
+
 
 
