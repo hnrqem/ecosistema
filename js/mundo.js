@@ -43,7 +43,7 @@ export default class Mundo {
             }
         }
 
-        if (Math.random() < 0.03) this.gerarComida();
+        if (Math.random() < 0.07) this.gerarComida();
     }
 
     desenhar() {
@@ -97,3 +97,4 @@ export default class Mundo {
         }
     }
 }
+
