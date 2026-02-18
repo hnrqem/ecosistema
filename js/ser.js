@@ -21,7 +21,7 @@ export default class Ser {
 
         if (ameaca) {
             this.fugir(ameaca);
-            this.energia -= 0.1; // fugir custa mais energia
+            this.energia -= 0.1; 
         } else {
             let alvo = this.buscarComida(listaComida);
 
@@ -34,7 +34,7 @@ export default class Ser {
         }
     }
 
-    // 🔥 Vetor curto para mundo com wrap (tipo Pac-Man)
+   
     obterVetorCurto(alvoX, alvoY) {
         let dx = alvoX - this.x;
         let dy = alvoY - this.y;
@@ -129,5 +129,6 @@ export default class Ser {
         if (this.y < 0) this.y = this.alturaMundo;
     }
 }
+
 
 
